@@ -1,10 +1,22 @@
 #include "player.h"
+#include "item.h"
 
 #include <raymath.h>
 
-void player_create(Player *player, Vector2 position)
+void player_init(Player *player, Vector2 position)
 {
     player->pos = position;
+    player->health = 100;
+    player->equipped_shield = item_generate_shield(ITEM_RARITY_COMMON);
+    player->shield = player->equipped_shield.shield.capacity;
+
+    player->equipped_weapon = item_generate_weapon(ITEM_RARITY_COMMON);
+
+    for (int i = 0; i < NUM_ITEMS; i++) {
+        player->inventory[i] = (Item){ .type = ITEM_TYPE_NONE };
+    }
+
+    player->inventory[0] = player->equipped_weapon;
 }
 
 void player_update(Player *player, float delta)
@@ -38,7 +50,9 @@ void player_update(Player *player, float delta)
 
 void player_render(Player *player)
 {
-    DrawRectangle(player->pos.x, player->pos.y, 50, 50, BLUE);
+    DrawCircleV(player->pos, 20, BLUE);
+    DrawText(TextFormat("Health: %.2f", player->health), 5, 5, 20, BLACK);
+    DrawText(TextFormat("Shield: %.2f", player->shield), 5, 25, 20, BLACK);
 }
 
 void player_destroy(Player *player)
