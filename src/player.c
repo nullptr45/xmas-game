@@ -2,40 +2,43 @@
 
 #include <raymath.h>
 
-#define PLAYER_ACC 5.0
-
 void player_create(Player *player, Vector2 position)
 {
-    player->vel = Vector2Zero();
-    player->acc = Vector2Zero();
     player->pos = position;
 }
 
-void player_update(Player *player)
+void player_update(Player *player, float delta)
 {
+    Vector2 move = Vector2Zero();
+    const float move_speed = 200;
+
     if (IsKeyDown(KEY_W)) {
-        player->acc.y -= 5.0;
+        move.y = -1;
     }
 
     if (IsKeyDown(KEY_S)) {
-        player->acc.y += 5.0;
+        move.y = 1;
     }
 
     if (IsKeyDown(KEY_A)) {
-        player->acc.x -= 5.0;
+        move.x = -1;
     }
 
     if (IsKeyDown(KEY_D)) {
-        player->acc.x += 5.0;
+        move.x = 1;
     }
 
-    player->vel = player->acc;
-    player->pos = player->vel;
+    if (move.x != 0 || move.y != 0) {
+        move = Vector2Normalize(move);
+        move = Vector2Scale(move, delta * move_speed);
+    }
+
+    player->pos = Vector2Add(player->pos, move);
 }
 
 void player_render(Player *player)
 {
-    DrawRectangle(player->pos.x, player->pos.y, 50, 50, RED);
+    DrawRectangle(player->pos.x, player->pos.y, 50, 50, BLUE);
 }
 
 void player_destroy(Player *player)
