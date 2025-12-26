@@ -12,7 +12,10 @@ typedef struct {
 
     float health;
     float shield;
+    int rounds;
+
     float shoot_timer;
+    float reload_timer;
 
     Item equipped_weapon;
     Item equipped_shield;

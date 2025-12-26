@@ -25,7 +25,7 @@ static void fire_bullet(GameData *game, Vector2 origin)
     dir = Vector2Normalize(dir);
 
     Weapon *weapon = &game->player.equipped_weapon.weapon;
-    if (game->player.shoot_timer <= 0) {
+    if (game->player.shoot_timer <= 0 && game->player.rounds > 0) {
         spawn_projectile(
             game->projectiles,
             game->player.entity.pos,
@@ -35,6 +35,8 @@ static void fire_bullet(GameData *game, Vector2 origin)
         );
 
         game->player.shoot_timer = 1.0f / weapon->fire_rate;
+        game->player.rounds--;
+        game->player.reload_timer = weapon->reload_speed;
     }
 }
 
@@ -79,6 +81,13 @@ void game_render(GameData *game)
 
     Vector2 mouse = GetMousePosition();
     DrawCircleLines(mouse.x, mouse.y, 6, RED);
+    DrawText(TextFormat("Health: %.2f", game->player.health), 5, 5, 20, BLACK);
+    DrawText(TextFormat("Shield: %.2f", game->player.shield), 5, 25, 20, BLACK);
+    if (game->player.rounds > 0) {
+        DrawText(TextFormat("%d/%d", game->player.rounds, game->player.equipped_weapon.weapon.mag_size), 5, 40, 20, BLACK);
+    } else {
+        DrawText("Reloading...", 5, 40, 20, BLACK);
+    }
 
     // for (int i = 0; i < MAX_ENEMIES; ++i) {
     //     enemy_render(&game->enemies[i]);

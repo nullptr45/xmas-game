@@ -16,18 +16,21 @@ void player_init(Player *player, Vector2 position)
     };
 
     player->health = 100;
-    player->shoot_timer = 0;
 
     player->equipped_shield = item_generate_shield(ITEM_RARITY_COMMON);
     player->shield = player->equipped_shield.shield.capacity;
 
     player->equipped_weapon = item_generate_weapon(ITEM_RARITY_COMMON);
+    player->rounds = player->equipped_weapon.weapon.mag_size;
 
     for (int i = 0; i < NUM_ITEMS; i++) {
         player->inventory[i] = (Item){ .type = ITEM_TYPE_NONE };
     }
 
     player->inventory[0] = player->equipped_weapon;
+
+    player->shoot_timer = 0;
+    player->reload_timer = 0;
 }
 
 void player_update(Player *player, float delta)
@@ -61,13 +64,17 @@ void player_update(Player *player, float delta)
     if (player->shoot_timer > 0) {
         player->shoot_timer -= delta;
     }
+
+    if (player->reload_timer > 0) {
+        player->reload_timer -= delta;
+    } else {
+        player->rounds = player->equipped_weapon.weapon.mag_size;
+    }
 }
 
 void player_render(Player *player)
 {
     DrawCircleV(player->entity.pos, player->entity.radius, player->entity.tint);
-    DrawText(TextFormat("Health: %.2f", player->health), 5, 5, 20, BLACK);
-    DrawText(TextFormat("Shield: %.2f", player->shield), 5, 25, 20, BLACK);
 }
 
 void player_destroy(Player *player)
