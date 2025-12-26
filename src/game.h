@@ -4,9 +4,6 @@
 #include "player.h"
 #include "projectile.h"
 
-#define MAX_ENEMIES 256
-#define MAX_PROJECTILES 256
-
 typedef struct {
     Player player;
     Enemy enemies[MAX_ENEMIES];

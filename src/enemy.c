@@ -58,7 +58,8 @@ void enemy_init(Enemy *enemy, Vector2 position)
     enemy->entity.radius = 10.0f;
     enemy->entity.active = true;
     enemy->entity.tint = RED;
-    enemy->max_health = 20.0f;
+    enemy->max_health = 100.0f;
+    enemy->health = enemy->max_health;
     enemy->speed = 125.0f;
 } 
 

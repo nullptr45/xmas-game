@@ -13,3 +13,4 @@ typedef struct {
     bool active;
 } Entity;
 
+bool colliding(Entity *a, Entity *b);

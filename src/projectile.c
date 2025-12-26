@@ -13,14 +13,25 @@ void projectile_spawn(Projectile *p, Vector2 position, Vector2 direction, float 
     p->speed = speed;
     p->damage = damage;
     p->direction = direction;
-    p->lifetime = 5;
+    p->lifetime = 2;
 }
 
-void projectile_update(Projectile *p, float delta)
+void projectile_update(Projectile *p, float delta, Enemy *enemies)
 {
     if (!p->entity.active) return;
 
     p->entity.pos = Vector2Add(p->entity.pos, Vector2Scale(p->direction, p->speed * delta));
+
+    for (int i = 0; i < MAX_ENEMIES; ++i) {
+        if (!enemies[i].entity.active) break;
+
+        if (colliding(&p->entity, &enemies[i].entity)) {
+            enemy_take_damage(&enemies[i], p->damage);
+            p->entity.active = false;
+            return;
+        }
+    }
+
     p->lifetime -= delta;
 
     if (p->lifetime <= 0) {

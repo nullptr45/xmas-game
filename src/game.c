@@ -100,7 +100,7 @@ void game_update(GameData *game, float delta)
     }
 
     for (int i = 0; i < MAX_PROJECTILES; ++i) {
-        projectile_update(&game->projectiles[i], delta);
+        projectile_update(&game->projectiles[i], delta, game->enemies);
     }
 }
 

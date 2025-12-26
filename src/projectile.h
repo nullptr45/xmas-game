@@ -1,6 +1,9 @@
 #pragma once
 
+#include "enemy.h"
 #include "entity.h"
+
+#define MAX_PROJECTILES 256
 
 typedef struct {
     Entity entity;
@@ -12,5 +15,5 @@ typedef struct {
 } Projectile;
 
 void projectile_spawn(Projectile *p, Vector2 position, Vector2 direction, float speed, float damage);
-void projectile_update(Projectile *p, float delta);
+void projectile_update(Projectile *p, float delta, Enemy *enemies);
 void projectile_render(Projectile *p);

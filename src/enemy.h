@@ -5,6 +5,8 @@
 #include <raylib.h>
 #include <stdbool.h>
 
+#define MAX_ENEMIES 256
+
 typedef enum {
     ENEMY_TYPE_NONE,
     ENEMY_TYPE_MELEE,
