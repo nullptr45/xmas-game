@@ -12,7 +12,7 @@ Item item_generate_weapon(ItemRarity rarity)
     item.weapon.damage = randint(8, 12) * mult;
     item.weapon.fire_rate = randint(3, 8) * 0.5f;
     item.weapon.reload_speed = randint(10, 30) * 0.1f;
-    item.weapon.projectile_speed = randint(35, 200);
+    item.weapon.projectile_speed = randint(300, 1000);
     item.weapon.mag_size = randint(6, 30);
 
     return item;

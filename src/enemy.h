@@ -1,5 +1,7 @@
 #pragma once
 
+#include "entity.h"
+
 #include <raylib.h>
 #include <stdbool.h>
 
@@ -17,14 +19,13 @@ typedef enum {
 } EnemyRank;
 
 typedef struct {
-    Vector2 pos;
-    Color color;
+    Entity entity;
     float health;
     EnemyType type;
-    bool active;
 } Enemy;
 
 void enemy_init(Enemy *enemy);
+void enemy_spawn(Enemy *enemy, Vector2 pos, EnemyType type, EnemyRank rank);
 void enemy_update(Enemy *enemy, float delta);
 void enemy_render(Enemy *enemy);
 void enemy_shutdown(Enemy *enemy);

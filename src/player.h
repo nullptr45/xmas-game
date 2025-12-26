@@ -1,5 +1,6 @@
 #pragma once
 
+#include "entity.h"
 #include "item.h"
 
 #include <raylib.h>
@@ -7,9 +8,11 @@
 #define NUM_ITEMS 4
 
 typedef struct {
-    Vector2 pos;
+    Entity entity;
+
     float health;
     float shield;
+    float shoot_timer;
 
     Item equipped_weapon;
     Item equipped_shield;

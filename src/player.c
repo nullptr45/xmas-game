@@ -1,12 +1,23 @@
 #include "player.h"
+#include "entity.h"
 #include "item.h"
 
+#include <math.h>
+#include <raylib.h>
 #include <raymath.h>
 
 void player_init(Player *player, Vector2 position)
 {
-    player->pos = position;
+    player->entity = (Entity) {
+        .pos = position,
+        .radius = 20,
+        .tint = BLUE,
+        .active = true
+    };
+
     player->health = 100;
+    player->shoot_timer = 0;
+
     player->equipped_shield = item_generate_shield(ITEM_RARITY_COMMON);
     player->shield = player->equipped_shield.shield.capacity;
 
@@ -45,12 +56,16 @@ void player_update(Player *player, float delta)
         move = Vector2Scale(move, delta * move_speed);
     }
 
-    player->pos = Vector2Add(player->pos, move);
+    player->entity.pos = Vector2Add(player->entity.pos, move);
+
+    if (player->shoot_timer > 0) {
+        player->shoot_timer -= delta;
+    }
 }
 
 void player_render(Player *player)
 {
-    DrawCircleV(player->pos, 20, BLUE);
+    DrawCircleV(player->entity.pos, player->entity.radius, player->entity.tint);
     DrawText(TextFormat("Health: %.2f", player->health), 5, 5, 20, BLACK);
     DrawText(TextFormat("Shield: %.2f", player->shield), 5, 25, 20, BLACK);
 }
