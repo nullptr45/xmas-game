@@ -50,8 +50,8 @@ static void spawn_enemy(GameData *game)
 {
     for (int i = 0; i < MAX_ENEMIES; ++i) {
         Vector2 spawn_pos = {
-            game->player.entity.pos.x + GetRandomValue(-300, 300),
-            game->player.entity.pos.y + GetRandomValue(-300, 300)
+            game->player.entity.pos.x + GetRandomValue(-600, 600),
+            game->player.entity.pos.y + GetRandomValue(-600, 600)
         };
 
         enemy_init(&game->enemies[i], spawn_pos);
@@ -92,7 +92,7 @@ void game_update(GameData *game, float delta)
     game->camera.target = game->player.entity.pos;
 
     for (int i = 0; i < MAX_ENEMIES; ++i) {
-        enemy_update(&game->enemies[i], delta);
+        enemy_update(&game->enemies[i], delta, &game->player.entity);
     }
 
     if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {

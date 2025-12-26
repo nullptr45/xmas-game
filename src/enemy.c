@@ -59,10 +59,17 @@ void enemy_init(Enemy *enemy, Vector2 position)
     enemy->entity.active = true;
     enemy->entity.tint = RED;
     enemy->max_health = 20.0f;
+    enemy->speed = 125.0f;
 } 
 
-void enemy_update(Enemy *enemy, float delta)
+void enemy_update(Enemy *enemy, float delta, Entity *player)
 {
+    if (!enemy->entity.active) return;
+
+    Vector2 dir = Vector2Subtract(player->pos, enemy->entity.pos);
+    Vector2 move = Vector2Scale(Vector2Normalize(dir), enemy->speed * delta);
+
+    enemy->entity.pos = Vector2Add(enemy->entity.pos, move);
 }
 
 void enemy_render(Enemy *enemy)
@@ -84,7 +91,12 @@ void enemy_render(Enemy *enemy)
     }
 }
 
-void enemy_shutdown(Enemy *enemy)
+void enemy_take_damage(Enemy *enemy, float damage)
 {
+    if (!enemy->entity.active) return;
+
+    enemy->health -= damage;
+
+    if (enemy->health <= 0) enemy->entity.active = false;
 }
 

@@ -23,6 +23,7 @@ typedef struct {
 
     float max_health;
     float health;
+    float speed;
 
     EnemyType type;
     EnemyRank rank;
@@ -31,7 +32,6 @@ typedef struct {
 } Enemy;
 
 void enemy_init(Enemy *enemy, Vector2 position);
-void enemy_spawn(Enemy *enemy, Vector2 pos, EnemyType type, EnemyRank rank);
-void enemy_update(Enemy *enemy, float delta);
+void enemy_update(Enemy *enemy, float delta, Entity *player);
 void enemy_render(Enemy *enemy);
-void enemy_shutdown(Enemy *enemy);
+void enemy_take_damage(Enemy *enemy, float damage);
