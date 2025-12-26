@@ -11,14 +11,15 @@ typedef struct {
     Entity entity;
 
     float health;
-    float shield;
+    float shield_health;
     int rounds;
+    bool is_reloading;
 
     float shoot_timer;
     float reload_timer;
 
-    Item equipped_weapon;
-    Item equipped_shield;
+    Item weapon;
+    Item shield;
 
     Item inventory[NUM_ITEMS];
 } Player;

@@ -2,7 +2,6 @@
 #include "entity.h"
 #include "item.h"
 
-#include <math.h>
 #include <raylib.h>
 #include <raymath.h>
 
@@ -17,20 +16,21 @@ void player_init(Player *player, Vector2 position)
 
     player->health = 100;
 
-    player->equipped_shield = item_generate_shield(ITEM_RARITY_COMMON);
-    player->shield = player->equipped_shield.shield.capacity;
+    player->shield = item_generate_shield(ITEM_RARITY_COMMON);
+    player->shield_health = player->shield.shield.capacity;
 
-    player->equipped_weapon = item_generate_weapon(ITEM_RARITY_COMMON);
-    player->rounds = player->equipped_weapon.weapon.mag_size;
+    player->weapon = item_generate_weapon(ITEM_RARITY_COMMON);
+    player->rounds = player->weapon.weapon.mag_size;
 
     for (int i = 0; i < NUM_ITEMS; i++) {
         player->inventory[i] = (Item){ .type = ITEM_TYPE_NONE };
     }
 
-    player->inventory[0] = player->equipped_weapon;
+    player->inventory[0] = player->weapon;
 
     player->shoot_timer = 0;
     player->reload_timer = 0;
+    player->is_reloading = false;
 }
 
 void player_update(Player *player, float delta)
@@ -65,10 +65,13 @@ void player_update(Player *player, float delta)
         player->shoot_timer -= delta;
     }
 
-    if (player->reload_timer > 0) {
-        player->reload_timer -= delta;
-    } else {
-        player->rounds = player->equipped_weapon.weapon.mag_size;
+    if (player->is_reloading) {
+        if (player->reload_timer > 0) {
+            player->reload_timer -= delta;
+        } else {
+            player->rounds = player->weapon.weapon.mag_size;
+            player->is_reloading = false;
+        }
     }
 }
 

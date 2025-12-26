@@ -26,7 +26,7 @@ Item item_generate_shield(ItemRarity rarity)
 
     float mult = rarity_multiplier(rarity);
 
-    item.shield.capacity = randint(20, 50) * mult;
+    item.shield.capacity = randint(50, 150) * mult;
     item.shield.recharge_rate = randint(5, 15) * mult;
     item.shield.recharge_delay = randint(1, 4);
 

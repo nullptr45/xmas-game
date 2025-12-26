@@ -11,6 +11,7 @@ typedef struct {
     Player player;
     Enemy enemies[MAX_ENEMIES];
     Projectile projectiles[MAX_PROJECTILES];
+    Camera2D camera;
 } GameData;
 
 void game_init(GameData *game);

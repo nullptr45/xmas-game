@@ -20,11 +20,17 @@ typedef enum {
 
 typedef struct {
     Entity entity;
+
+    float max_health;
     float health;
+
     EnemyType type;
+    EnemyRank rank;
+
+    bool active;
 } Enemy;
 
-void enemy_init(Enemy *enemy);
+void enemy_init(Enemy *enemy, Vector2 position);
 void enemy_spawn(Enemy *enemy, Vector2 pos, EnemyType type, EnemyRank rank);
 void enemy_update(Enemy *enemy, float delta);
 void enemy_render(Enemy *enemy);

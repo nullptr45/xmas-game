@@ -2,17 +2,86 @@
 
 #include <raymath.h>
 
-void enemy_init(Enemy *enemy)
+static void draw_enemy_health_bar(
+    Vector2 pos,
+    float radius,
+    float health,
+    float max_health,
+    EnemyRank rank
+)
 {
-    enemy->entity.active = false;
+    float t = health / max_health;
+    if (t < 0) t = 0;
+    if (t > 1) t = 1;
+
+    float width = radius * 2.0f;
+    float height = (rank == ENEMY_RANK_BADASS) ? 6.0f : 4.0f;
+
+    Vector2 bar_pos = {
+        pos.x - width * 0.5f,
+        pos.y - radius - 10.0f
+    };
+
+    DrawRectangle(
+        bar_pos.x,
+        bar_pos.y,
+        width,
+        height,
+        (Color){30, 30, 30, 200}
+    );
+
+    Color fill = GREEN;
+    if (t < 0.6f) fill = YELLOW;
+    if (t < 0.3f) fill = RED;
+
+    DrawRectangle(
+        bar_pos.x,
+        bar_pos.y,
+        width * t,
+        height,
+        fill
+    );
+
+    DrawRectangleLines(
+        bar_pos.x,
+        bar_pos.y,
+        width,
+        height,
+        BLACK
+    );
+}
+
+void enemy_init(Enemy *enemy, Vector2 position)
+{
+    enemy->entity.active = true;
+    enemy->entity.pos = position;
+    enemy->entity.radius = 10.0f;
+    enemy->entity.active = true;
+    enemy->entity.tint = RED;
+    enemy->max_health = 20.0f;
 } 
 
-void enemy_update(Enemy *enemy, float delts)
+void enemy_update(Enemy *enemy, float delta)
 {
 }
 
 void enemy_render(Enemy *enemy)
 {
+    if (!enemy->entity.active) return;
+
+    DrawCircleV(enemy->entity.pos, enemy->entity.radius, enemy->entity.tint);
+
+    if (enemy->health < enemy->max_health ||
+        enemy->rank == ENEMY_RANK_BADASS)
+    {
+        draw_enemy_health_bar(
+            enemy->entity.pos,
+            enemy->entity.radius,
+            enemy->health,
+            enemy->max_health,
+            enemy->rank
+        );
+    }
 }
 
 void enemy_shutdown(Enemy *enemy)

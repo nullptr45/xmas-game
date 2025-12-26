@@ -8,7 +8,6 @@ typedef enum {
     ITEM_TYPE_NONE,
     ITEM_TYPE_WEAPON,
     ITEM_TYPE_SHIELD,
-    ITEM_TYPE_AMMO,
 } ItemType;
 
 typedef enum {
