@@ -10,18 +10,8 @@ static void draw_bar(Vector2 pos, Vector2 size, float value, float max_value, Co
     if (t > 1.0f) t = 1.0f;
 
     DrawRectangleV(pos, size, back);
-    DrawRectangle(
-        pos.x,
-        pos.y,
-        size.x * t,
-        size.y,
-        fill
-    );
-    DrawRectangleLinesEx(
-        (Rectangle){pos.x, pos.y, size.x, size.y},
-        2.0f,
-        frame
-    );
+    DrawRectangle(pos.x, pos.y, size.x * t, size.y, fill);
+    DrawRectangleLinesEx((Rectangle){pos.x, pos.y, size.x, size.y}, 2.0f, frame);
 }
 
 void ui_draw(const Player *player)

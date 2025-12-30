@@ -5,11 +5,9 @@
 
 typedef struct {
     Vector2 pos;
-
+    Vector2 vel;
     float radius;
-    // Rectangle sprite_src;
     Color tint;
-
     bool active;
 } Entity;
 

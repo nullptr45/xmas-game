@@ -9,6 +9,7 @@ void player_init(Player *player, Vector2 position)
 {
     player->entity = (Entity) {
         .pos = position,
+        .vel = Vector2Zero(),
         .radius = 20,
         .tint = BLUE,
         .active = true
@@ -35,40 +36,36 @@ void player_init(Player *player, Vector2 position)
 
 void player_update(Player *player, float delta)
 {
+    static const float acc = 1400;
+    static const float friction = 8;
+    static const float max_speed = 200;
+
     Vector2 move = Vector2Zero();
-    const float move_speed = 200;
 
-    if (IsKeyDown(KEY_W)) {
-        move.y = -1;
-    }
+    if (IsKeyDown(KEY_W)) move.y -= 1;
+    if (IsKeyDown(KEY_S)) move.y += 1;
+    if (IsKeyDown(KEY_A)) move.x -= 1;
+    if (IsKeyDown(KEY_D)) move.x += 1;
 
-    if (IsKeyDown(KEY_S)) {
-        move.y = 1;
-    }
-
-    if (IsKeyDown(KEY_A)) {
-        move.x = -1;
-    }
-
-    if (IsKeyDown(KEY_D)) {
-        move.x = 1;
-    }
-
-    if (move.x != 0 || move.y != 0) {
+    if (Vector2LengthSqr(move) > 0.01) {
         move = Vector2Normalize(move);
-        move = Vector2Scale(move, delta * move_speed);
+        player->entity.vel = Vector2Add(player->entity.vel, Vector2Scale(move, acc * delta));
     }
 
-    player->entity.pos = Vector2Add(player->entity.pos, move);
+    if (Vector2Length(player->entity.vel) > max_speed) {
+        player->entity.vel = Vector2Scale(Vector2Normalize(player->entity.vel), max_speed);
+    }
+
+    player->entity.vel = Vector2Lerp(player->entity.vel, Vector2Zero(), friction * delta);
+    player->entity.pos = Vector2Add(player->entity.pos, Vector2Scale(player->entity.vel, delta));
 
     if (player->shoot_timer > 0) {
         player->shoot_timer -= delta;
     }
 
     if (player->is_reloading) {
-        if (player->reload_timer > 0) {
-            player->reload_timer -= delta;
-        } else {
+        player->reload_timer -= delta;
+        if (player->reload_timer <= 0) {
             player->rounds = player->weapon.weapon.mag_size;
             player->is_reloading = false;
         }

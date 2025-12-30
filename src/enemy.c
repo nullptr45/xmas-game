@@ -2,13 +2,7 @@
 
 #include <raymath.h>
 
-static void draw_enemy_health_bar(
-    Vector2 pos,
-    float radius,
-    float health,
-    float max_health,
-    EnemyRank rank
-)
+static void draw_enemy_health_bar(Vector2 pos, float radius, float health, float max_health, EnemyRank rank)
 {
     float t = health / max_health;
     if (t < 0) t = 0;
@@ -58,19 +52,27 @@ void enemy_init(Enemy *enemy, Vector2 position)
     enemy->entity.radius = 10.0f;
     enemy->entity.active = true;
     enemy->entity.tint = RED;
+    enemy->entity.vel = Vector2Zero();
     enemy->max_health = 100.0f;
     enemy->health = enemy->max_health;
-    enemy->speed = 125.0f;
+    enemy->speed = 900.0f;
 } 
 
 void enemy_update(Enemy *enemy, float delta, Entity *player)
 {
     if (!enemy->entity.active) return;
 
-    Vector2 dir = Vector2Subtract(player->pos, enemy->entity.pos);
-    Vector2 move = Vector2Scale(Vector2Normalize(dir), enemy->speed * delta);
+    static const float friction = 8;
 
-    enemy->entity.pos = Vector2Add(enemy->entity.pos, move);
+    Vector2 dir = Vector2Subtract(player->pos, enemy->entity.pos);
+
+    if (Vector2Length(dir) > 0.01) {
+        dir = Vector2Normalize(dir);
+        enemy->entity.vel = Vector2Add(enemy->entity.vel, Vector2Scale(dir, enemy->speed * delta));
+    }
+
+    enemy->entity.vel = Vector2Lerp(enemy->entity.vel, Vector2Zero(), friction * delta);
+    enemy->entity.pos = Vector2Add(enemy->entity.pos, Vector2Scale(enemy->entity.vel, delta));
 }
 
 void enemy_render(Enemy *enemy)
@@ -79,9 +81,7 @@ void enemy_render(Enemy *enemy)
 
     DrawCircleV(enemy->entity.pos, enemy->entity.radius, enemy->entity.tint);
 
-    if (enemy->health < enemy->max_health ||
-        enemy->rank == ENEMY_RANK_BADASS)
-    {
+    if (enemy->health < enemy->max_health || enemy->rank == ENEMY_RANK_BADASS) {
         draw_enemy_health_bar(
             enemy->entity.pos,
             enemy->entity.radius,
