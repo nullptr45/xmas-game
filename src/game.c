@@ -91,8 +91,17 @@ void game_update(GameData *game, float delta)
     player_update(&game->player, delta);
     game->camera.target = game->player.entity.pos;
 
-    for (int i = 0; i < MAX_ENEMIES; ++i) {
-        enemy_update(&game->enemies[i], delta, &game->player.entity);
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        enemy_update(&game->enemies[i], delta, &game->player);
+}
+
+    for (int i = 0; i < MAX_ENEMIES; i++) {
+        for (int j = i + 1; j < MAX_ENEMIES; j++) {
+            if (!game->enemies[i].entity.active || !game->enemies[j].entity.active) continue;
+
+            // Maximum of 256^2 checks per frame which is fine for performance
+            resolve_collision(&game->enemies[i].entity, &game->enemies[j].entity);
+        }
     }
 
     if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {

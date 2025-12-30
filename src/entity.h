@@ -12,3 +12,4 @@ typedef struct {
 } Entity;
 
 bool colliding(Entity *a, Entity *b);
+void resolve_collision(Entity *a, Entity *b);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "entity.h"
+#include "player.h"
 
 #include <raylib.h>
 #include <stdbool.h>
@@ -27,6 +28,10 @@ typedef struct {
     float health;
     float speed;
 
+    float damage;
+    float attack_cooldown;
+    float attack_timer;
+
     EnemyType type;
     EnemyRank rank;
 
@@ -34,6 +39,6 @@ typedef struct {
 } Enemy;
 
 void enemy_init(Enemy *enemy, Vector2 position);
-void enemy_update(Enemy *enemy, float delta, Entity *player);
+void enemy_update(Enemy *enemy, float delta, Player *player);
 void enemy_render(Enemy *enemy);
 void enemy_take_damage(Enemy *enemy, float damage);

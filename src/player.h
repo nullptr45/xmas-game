@@ -27,4 +27,5 @@ typedef struct {
 void player_init(Player *player, Vector2 position);
 void player_update(Player *player, float delta);
 void player_render(Player *player);
-void player_destroy(Player *player);
+void player_take_damage(Player *player, float damage);
+void player_take_knockback(Player *player, Vector2 dir, float knockback);

@@ -77,7 +77,20 @@ void player_render(Player *player)
     DrawCircleV(player->entity.pos, player->entity.radius, player->entity.tint);
 }
 
-void player_destroy(Player *player)
+void player_take_damage(Player *player, float damage)
 {
+    if (damage > player->shield_health) {
+        player->health -= damage - player->shield_health;
+        player->shield_health = 0;
+    }
+
+    player->shield_health -= damage;
+
+    if (player->shield_health <= 0) player->shield_health = 0;
+}
+
+void player_take_knockback(Player *player, Vector2 dir, float knockback)
+{
+    player->entity.vel = Vector2Add(player->entity.vel, Vector2Scale(dir, knockback));
 }
 

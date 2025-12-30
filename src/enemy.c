@@ -56,23 +56,40 @@ void enemy_init(Enemy *enemy, Vector2 position)
     enemy->max_health = 100.0f;
     enemy->health = enemy->max_health;
     enemy->speed = 900.0f;
+    enemy->damage = 10.0f;
+    enemy->attack_cooldown = 0.5f;
+    enemy->attack_timer = 0.0f;
 } 
 
-void enemy_update(Enemy *enemy, float delta, Entity *player)
+void enemy_update(Enemy *enemy, float delta, Player *player)
 {
     if (!enemy->entity.active) return;
 
+    if (enemy->attack_timer > 0)
+        enemy->attack_timer -= delta;
+
     static const float friction = 8;
+    static const float knockback = 400;
 
-    Vector2 dir = Vector2Subtract(player->pos, enemy->entity.pos);
+    Vector2 dir = Vector2Subtract(player->entity.pos, enemy->entity.pos);
+    float dist = Vector2Length(dir);
 
-    if (Vector2Length(dir) > 0.01) {
+    if (dist > 0.01) {
         dir = Vector2Normalize(dir);
         enemy->entity.vel = Vector2Add(enemy->entity.vel, Vector2Scale(dir, enemy->speed * delta));
     }
 
     enemy->entity.vel = Vector2Lerp(enemy->entity.vel, Vector2Zero(), friction * delta);
     enemy->entity.pos = Vector2Add(enemy->entity.pos, Vector2Scale(enemy->entity.vel, delta));
+
+    resolve_collision(&enemy->entity, &player->entity);
+
+    if (dist < player->entity.radius + enemy->entity.radius && enemy->attack_timer <= 0) {
+        player_take_damage(player, enemy->damage);
+        Vector2 force = Vector2Normalize(Vector2Subtract(player->entity.pos, enemy->entity.pos));
+        player_take_knockback(player, force, knockback);
+        enemy->attack_timer = enemy->attack_cooldown;
+    }
 }
 
 void enemy_render(Enemy *enemy)
