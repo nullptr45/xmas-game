@@ -15,7 +15,6 @@ typedef enum {
 } EnemyType;
 
 typedef enum {
-    ENEMY_RANK_NONE,
     ENEMY_RANK_WEAK,
     ENEMY_RANK_NORMAL,
     ENEMY_RANK_BADASS,
@@ -38,7 +37,7 @@ typedef struct {
     bool active;
 } Enemy;
 
-void enemy_init(Enemy *enemy, Vector2 position);
+void enemy_init(Enemy *enemy, Vector2 position, EnemyRank rank, float scale);
 void enemy_update(Enemy *enemy, float delta, Player *player);
 void enemy_render(Enemy *enemy);
-void enemy_take_damage(Enemy *enemy, float damage);
+void enemy_take_damage(Enemy *enemy, Player *player, float damage);

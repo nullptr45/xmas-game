@@ -16,7 +16,7 @@ void projectile_spawn(Projectile *p, Vector2 position, Vector2 direction, float 
     p->lifetime = 2;
 }
 
-void projectile_update(Projectile *p, float delta, Enemy *enemies)
+void projectile_update(Projectile *p, Player *player, float delta, Enemy *enemies)
 {
     if (!p->entity.active) return;
 
@@ -26,7 +26,7 @@ void projectile_update(Projectile *p, float delta, Enemy *enemies)
         if (!enemies[i].entity.active) break;
 
         if (colliding(&p->entity, &enemies[i].entity)) {
-            enemy_take_damage(&enemies[i], p->damage);
+            enemy_take_damage(&enemies[i], player, p->damage);
             p->entity.active = false;
             return;
         }

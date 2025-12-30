@@ -1,6 +1,28 @@
 # todo
 
-[x] movement
-[ ] enemies
-[ ] combat
-[ ] health
+- movement
+    - [x] acceleration and friction
+    - [x] collision detection
+- enemies
+    - [x] Chase player
+    - [x] Attack player
+    - [x] Die
+    - [x] Ranks
+    - [ ] Enemy variety
+        - [x] Melee
+        - [ ] Ranged
+- gameplay
+    - [x] Difficulty scaling based on time
+    - [ ] Pause/Inventory menu
+    - [ ] Level up rewards
+    - [ ] Gun variety
+        - [ ] Stats affected by weapon types
+    - [ ] Shield variety
+    - [ ] Main menu
+    - [ ] Settings
+    - [ ] Legendary weapon effects
+- polish
+    - [ ] Proper UI
+    - [ ] Level up/XP text
+    - [ ] Particles
+    - [ ] Screen shake

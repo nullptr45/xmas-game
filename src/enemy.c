@@ -45,7 +45,7 @@ static void draw_enemy_health_bar(Vector2 pos, float radius, float health, float
     );
 }
 
-void enemy_init(Enemy *enemy, Vector2 position)
+void enemy_init(Enemy *enemy, Vector2 position, EnemyRank rank, float scale)
 {
     enemy->entity.active = true;
     enemy->entity.pos = position;
@@ -54,11 +54,35 @@ void enemy_init(Enemy *enemy, Vector2 position)
     enemy->entity.tint = RED;
     enemy->entity.vel = Vector2Zero();
     enemy->max_health = 100.0f;
-    enemy->health = enemy->max_health;
     enemy->speed = 900.0f;
-    enemy->damage = 10.0f;
     enemy->attack_cooldown = 0.5f;
     enemy->attack_timer = 0.0f;
+    enemy->rank = rank;
+
+    switch (rank) {
+        case ENEMY_RANK_WEAK:
+            enemy->max_health = 20.0f;
+            enemy->damage = 10.0f;
+            enemy->entity.radius = 10;
+            break;
+
+        case ENEMY_RANK_NORMAL:
+            enemy->max_health = 50.0f;
+            enemy->damage = 15.0f;
+            enemy->entity.radius = 14;
+            break;
+
+        case ENEMY_RANK_BADASS:
+            enemy->max_health = 150.0f;
+            enemy->damage = 20.0f;
+            enemy->entity.radius = 20;
+            break;
+    }
+
+    enemy->max_health *= scale;
+    enemy->damage *= (0.7f + scale * 0.3f);
+    enemy->speed *= (1.0f + 0.15f * logf(scale));
+    enemy->health = enemy->max_health;
 } 
 
 void enemy_update(Enemy *enemy, float delta, Player *player)
@@ -109,12 +133,28 @@ void enemy_render(Enemy *enemy)
     }
 }
 
-void enemy_take_damage(Enemy *enemy, float damage)
+void enemy_take_damage(Enemy *enemy, Player *player, float damage)
 {
     if (!enemy->entity.active) return;
 
     enemy->health -= damage;
 
-    if (enemy->health <= 0) enemy->entity.active = false;
+    if (enemy->health <= 0) {
+        enemy->entity.active = false;
+
+        float xp = 0.f;
+        switch (enemy->rank) {
+            case ENEMY_RANK_WEAK:
+                xp = 1.f;
+                break;
+            case ENEMY_RANK_NORMAL:
+                xp = 2.f;
+                break;
+            case ENEMY_RANK_BADASS:
+                xp = 5.f;
+                break;
+        }
+        player_gain_xp(player, xp);
+    }
 }
 

@@ -18,6 +18,7 @@ void ui_draw(const Player *player)
 {
     const int margin = 20;
     const int bar_width = 220;
+    const int xp_bar_width = bar_width * 1.5;
     const int bar_height = 18;
     const int spacing = 6;
 
@@ -55,7 +56,7 @@ void ui_draw(const Player *player)
         health_pos,
         (Vector2){bar_width, bar_height},
         player->health,
-        100.0f,
+        player->max_health,
         (Color){200, 40, 40, 255},
         (Color){30, 10, 10, 255},
         RED
@@ -65,6 +66,30 @@ void ui_draw(const Player *player)
         TextFormat("%.0f", player->health),
         health_pos.x + 6,
         health_pos.y + 4,
+        12,
+        LIGHTGRAY
+    );
+
+    // XP
+    Vector2 xp_pos = {
+        GetScreenWidth() * 0.5f - xp_bar_width * 0.5f,
+        base.y + bar_height + spacing
+    };
+
+    draw_bar(
+        xp_pos,
+        (Vector2){xp_bar_width, bar_height},
+        player->xp,
+        player->max_xp,
+        (Color){80, 160, 255, 255},
+        (Color){20, 20, 30, 255},
+        BLUE
+    );
+
+    DrawText(
+        TextFormat("Level %d", player->level),
+        xp_pos.x + 6,
+        xp_pos.y + 4,
         12,
         LIGHTGRAY
     );

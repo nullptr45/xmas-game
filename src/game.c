@@ -1,63 +1,16 @@
 #include "game.h"
+#include "item.h"
 #include "ui.h"
 
 #include <raylib.h>
 #include <raymath.h>
 
-static void spawn_projectile(Projectile *projectiles, Vector2 pos, Vector2 dir, float speed, float damage)
-{
-    for (int i = 0; i < MAX_PROJECTILES; i++) {
-        if (!projectiles[i].entity.active) {
-            projectile_spawn(
-                &projectiles[i],
-                pos,
-                Vector2Normalize(dir),
-                speed,
-                damage
-            );
-            return;
-        }
-    }
-}
-
-static void fire_bullet(GameData *game, Vector2 origin)
-{
-    Vector2 target = GetScreenToWorld2D(GetMousePosition(), game->camera);
-    Vector2 dir = Vector2Subtract(target, origin);
-    dir = Vector2Normalize(dir);
-
-    Weapon *weapon = &game->player.weapon.weapon;
-    if (game->player.shoot_timer <= 0 && game->player.rounds > 0) {
-        spawn_projectile(
-            game->projectiles,
-            game->player.entity.pos,
-            dir,
-            weapon->projectile_speed,
-            weapon->damage
-        );
-
-        game->player.shoot_timer = 1.0f / weapon->fire_rate;
-        game->player.rounds--;
-    }
-
-    if (game->player.rounds <= 0) {
-        game->player.is_reloading = true;
-        game->player.reload_timer = weapon->reload_speed;
-    }
-}
-
-static void spawn_enemy(GameData *game)
-{
-    for (int i = 0; i < MAX_ENEMIES; ++i) {
-        Vector2 spawn_pos = {
-            game->player.entity.pos.x + GetRandomValue(-600, 600),
-            game->player.entity.pos.y + GetRandomValue(-600, 600)
-        };
-
-        enemy_init(&game->enemies[i], spawn_pos);
-        return;
-    }
-}
+static float difficulty_scale(float time);
+static float enemy_spawn_rate(float time);
+static EnemyRank roll_enemy_rank(float time);
+static void spawn_projectile(Projectile *projectiles, Vector2 pos, Vector2 dir, float speed, float damage);
+static void fire_bullet(GameData *game, Vector2 origin);
+static void spawn_enemy(GameData *game);
 
 void game_init(GameData *game)
 {
@@ -88,12 +41,20 @@ void game_init(GameData *game)
 
 void game_update(GameData *game, float delta)
 {
+    game->duration += delta;
+    game->spawn_timer -= delta;
+
+    if (game->spawn_timer <= 0.0f) {
+        spawn_enemy(game);
+        game->spawn_timer = enemy_spawn_rate(game->duration);
+    }
+
     player_update(&game->player, delta);
     game->camera.target = game->player.entity.pos;
 
     for (int i = 0; i < MAX_ENEMIES; i++) {
         enemy_update(&game->enemies[i], delta, &game->player);
-}
+    }
 
     for (int i = 0; i < MAX_ENEMIES; i++) {
         for (int j = i + 1; j < MAX_ENEMIES; j++) {
@@ -109,7 +70,7 @@ void game_update(GameData *game, float delta)
     }
 
     for (int i = 0; i < MAX_PROJECTILES; ++i) {
-        projectile_update(&game->projectiles[i], delta, game->enemies);
+        projectile_update(&game->projectiles[i], &game->player, delta, game->enemies);
     }
 }
 
@@ -134,3 +95,87 @@ void game_render(GameData *game)
     DrawCircleLines(mouse.x, mouse.y, 6, RED);
 }
 
+float difficulty_scale(float time)
+{
+    return 1.0f + 0.15f * logf(time + 1.0f);
+}
+
+float enemy_spawn_rate(float time)
+{
+    float rate = 2.0f - time * 0.005f;
+    if (rate < 0.3f) rate = 0.3f;
+    return rate;
+}
+
+EnemyRank roll_enemy_rank(float time)
+{
+    if (time < 30.0f)
+        return ENEMY_RANK_WEAK;
+
+    if (time < 90.0f) {
+        return (GetRandomValue(0, 100) < 80) ? ENEMY_RANK_NORMAL : ENEMY_RANK_WEAK;
+    }
+
+    if (time < 180.0f) {
+        int r = GetRandomValue(0, 100);
+        if (r < 60) return ENEMY_RANK_NORMAL;
+        if (r < 85) return ENEMY_RANK_BADASS;
+        return ENEMY_RANK_WEAK;
+    }
+
+    int r = GetRandomValue(0, 100);
+    if (r < 20) return ENEMY_RANK_BADASS;
+
+    return ENEMY_RANK_NORMAL;
+}
+
+void spawn_projectile(Projectile *projectiles, Vector2 pos, Vector2 dir, float speed, float damage)
+{
+    for (int i = 0; i < MAX_PROJECTILES; ++i) {
+        if (!projectiles[i].entity.active) {
+            projectile_spawn(&projectiles[i], pos, Vector2Normalize(dir), speed, damage);
+            return;
+        }
+    }
+}
+
+void fire_bullet(GameData *game, Vector2 origin)
+{
+    Vector2 target = GetScreenToWorld2D(GetMousePosition(), game->camera);
+    Vector2 dir = Vector2Subtract(target, origin);
+    dir = Vector2Normalize(dir);
+
+    Weapon *weapon = &game->player.weapon.weapon;
+    if (game->player.shoot_timer <= 0 && game->player.rounds > 0) {
+        spawn_projectile(
+            game->projectiles,
+            game->player.entity.pos,
+            dir,
+            weapon->projectile_speed,
+            weapon->damage
+        );
+
+        game->player.shoot_timer = 1.0f / weapon->fire_rate;
+        game->player.rounds--;
+    }
+
+    if (game->player.rounds <= 0 && !game->player.is_reloading) {
+        game->player.is_reloading = true;
+        game->player.reload_timer = weapon->reload_speed;
+    }
+}
+
+void spawn_enemy(GameData *game)
+{
+    for (int i = 0; i < MAX_ENEMIES; ++i) {
+        if (game->enemies[i].entity.active) continue;
+
+        Vector2 spawn_pos = {
+            game->player.entity.pos.x + GetRandomValue(-600, 600),
+            game->player.entity.pos.y + GetRandomValue(-600, 600)
+        };
+
+        enemy_init(&game->enemies[i], spawn_pos, roll_enemy_rank(game->duration), difficulty_scale(game->duration));
+        return;
+    }
+}
