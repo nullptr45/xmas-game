@@ -6,12 +6,10 @@ A fast-paced **top-down arena shooter** inspired by *Borderlands* and *Vampire S
 
 ## Requirements
 
-### Mandatory
-
 * **C compiler** with C99 support
   * GCC / Clang / MSVC
 * **CMake 3.15+**
-* **Git** (recommended)
+* **Git**
 
 ### Libraries
 
@@ -23,7 +21,7 @@ A fast-paced **top-down arena shooter** inspired by *Borderlands* and *Vampire S
 
 ## Building
 
-This project uses **CMake** and supports out-of-source builds.
+This project uses **CMake**
 
 ### 1. Clone the repository
 
@@ -79,16 +77,17 @@ After building, run the executable from the `build` directory:
 
 ## Controls
 
-* **WASD** – Move player
-* **Left Mouse Button** – Shoot
-* **Mouse** – Aim
+* **Movement** - WASD
+* **Aim** - Mouse
+* **Shoot** - Left click
+* **Reload** - R
 
 ---
 
 ## Design Notes
 
 * Uses **simple circle-based collision**
-* Physics is intentionally lightweight (velocity + friction)
+* Physics are intentionally lightweight (velocity + friction)
 
 This codebase is meant to be **easy to modify and extend**, not production-ready.
 
